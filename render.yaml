@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: chatgpt-webhook
+    name: gemini-webhook
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: python app.py
