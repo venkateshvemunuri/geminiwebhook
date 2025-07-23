@@ -3,16 +3,17 @@ import google.generativeai as genai
 import os
 
 app = Flask(__name__)
-genai.configure(api_key=os.getenv("AIzaSyCw0ZplxiBf5KFPPLdUA7G3EWzhc81FqMk"))
+
+# Set your Gemini API key here
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 model = genai.GenerativeModel("gemini-pro")
 
-@app.route('/gemini', methods=['POST'])
-def gemini_reply():
-    data = request.json
-    user_input = data.get("text", "")
-
+@app.route("/webhook", methods=["POST"])
+def webhook():
+    user_input = request.json.get("text", "")
     response = model.generate_content(user_input)
-    reply = response.text
+    return jsonify({"reply": response.text})
 
-    return jsonify({"output": reply})
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
