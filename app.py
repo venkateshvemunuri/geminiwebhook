@@ -4,11 +4,11 @@ import os
 
 app = Flask(__name__)
 
-# Set your Gemini API key (add this in Render as env variable: GEMINI_API_KEY)
+# ✅ Set your Gemini API key from the environment variable
 genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 
 # Create Gemini model
-model = genai.GenerativeModel('gemini-pro')
+model = genai.GenerativeModel(model_name="models/gemini-2.0-flash")
 
 @app.route('/')
 def home():
@@ -28,3 +28,7 @@ def webhook():
         return jsonify({'reply': reply})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+# ✅ Run Flask only if not in Render (Render sets its own web server)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=10000)
