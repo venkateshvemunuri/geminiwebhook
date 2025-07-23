@@ -4,16 +4,27 @@ import os
 
 app = Flask(__name__)
 
-# Set your Gemini API key here
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+# Set your Gemini API key (add this in Render as env variable: GEMINI_API_KEY)
+genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 
-model = genai.GenerativeModel("gemini-pro")
+# Create Gemini model
+model = genai.GenerativeModel('gemini-pro')
 
-@app.route("/webhook", methods=["POST"])
+@app.route('/')
+def home():
+    return "✅ Gemini IVR Webhook is running!"
+
+@app.route('/webhook', methods=['POST'])
 def webhook():
-    user_input = request.json.get("text", "")
-    response = model.generate_content(user_input)
-    return jsonify({"reply": response.text})
+    data = request.get_json()
+    user_input = data.get('text', '')
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
+    if not user_input:
+        return jsonify({'error': 'No input provided'}), 400
+
+    try:
+        response = model.generate_content(user_input)
+        reply = response.text
+        return jsonify({'reply': reply})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
